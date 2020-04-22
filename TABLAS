@@ -1,0 +1,43 @@
+ABLES
+  /FORMAT ZERO MISSING('.')
+  /GBASE=CASES
+  /TABLE= TOTAL + RP8 
+ BY (TOTAL + FORMA + TIPO) >  (TOTAL + BANCOPRIN) .
+*============================================================.
+*Eliminar y localizar Códigos Duplicados en el conocimiento.
+*============================================================.
+ 
+Vector Vec1 =   P1_01 To P1_26.
+Compute Ch.P1.Codigo.Duplicado = 0.
+Loop #I = 1 To 26 - 1 .
+Loop #J =  #I + 1 To 26.
+ 
+* esta elimina las marcas duplicadas.
+*   If ( Vec1 ( #I ) = Vec1 ( #J ) And Vec1 ( #I ) > 0 ) Vec1 ( #J ) = $sysmis .
+ 
+*con esto se lista las entrevistas duplicadas.
+If ( Vec1 ( #I ) = Vec1 ( #J ) ) Ch.P1.Codigo.Duplicado = 1 .
+ 
+End Loop .
+End Loop .
+Execute .
+ 
+*ENTREVISTAS CON CODIGOS DUPLICADOS EN P1.
+Temporary .
+Select If ( Ch.P1.Codigo.Duplicado > 0 ) .
+List Folio pais.
+ 
+DELETE VARIABLES
+ Ch.P1.Codigo.Duplicado.
+EXECUTE.
+
+=====================================
+
+CTABLES
+  /PCOMPUTE &x = EXPR(SUBTOTAL[1] + SUBTOTAL[2])
+  /PPROPERTIES &x LABEL="0-12"
+  /TABLE rehuso[C]
+  /CATEGORIES VARIABLES=rehuso [0 THRU 8, SUBTOTAL="0-8", 9 THRU 12, SUBTOTAL="9-12", &x, 
+   OTHERNM, SUBTOTAL=">12"] TOTAL=YES.
+   
+   
